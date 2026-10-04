@@ -1,32 +1,44 @@
 import { createButton } from "./library/UIManager";
-import { AnimalComponent, ColliderComponent, MapComponent, PathfindComponent, PlayerComponent, PointComponent, PositionComponent, ShapeComponent, SizeComponent, VelocityComponent } from "./component/component";
+import { AnimalComponent, ColliderComponent, LabelComponent, MapComponent, PathfindComponent, PlayerComponent, PointComponent, PositionComponent, ShapeComponent, SizeComponent, VelocityComponent } from "./component/component";
 import { Entity } from "./entity";
 import { MapGenerator } from "./library/mapGenerator";
-import { convertPathToCenterPoints } from "./library/pathfind";
+import { convertPathToCenterPoints, getRandomEmptyPoint } from "./library/pathfind";
+import { generateRandomName, generateRandomJapaneseLastName } from "./library/randomString";
 
 export function makeEntity(entities: Entity[], canvas: HTMLCanvasElement) {
 
-    entities.push(createPlayerEntity());
+    // entities.push(createPlayerEntity());
 
-    for (let i = 0; i < 5; i++) {
-        entities.push(createRandomPointEntity(canvas));
-    }
+    // for (let i = 0; i < 5; i++) {
+    //     entities.push(createRandomPointEntity(canvas));
+    // }
 
-    entities.push(
-        createButton(100, 0, 120, 40, "testButton", function () {
-            console.log("buttonAction");
-        })
-    );
+    // entities.push(
+    //     createButton(100, 0, 120, 40, "testButton", function () {
+    //         console.log("buttonAction");
+    //     })
+    // );
 
-    entities.push(...createSurroundingBlocks(100,100,150,150, 2));
+    // entities.push(...createSurroundingBlocks(100,100,150,150, 2));
 
     const mapEntity = createMap();
     entities.push(mapEntity);
     const mapComponent = mapEntity.components.MapComponent as MapComponent;
     // entities.push(...createMapBlock(mapComponent.grid));
 
-    const animalInitPoint = MapGenerator.convertPointToCenterPoint(mapComponent.centers[0], 10);
-    entities.push(createAnimalEntity(animalInitPoint));
+    
+    const animalLength = 50;
+    for (let i = 1; i <= animalLength; i++) {
+        let color = "black";
+        if (i == animalLength) color = "#FF3900";
+        const mapCellGridSize = 10;
+        let animalInitPoint = getRandomEmptyPoint(mapComponent.grid, mapCellGridSize);
+        if (animalInitPoint) {
+            entities.push(createAnimalEntity(animalInitPoint, color));
+        } else {
+            console.log("makeEntitiesにて、animalInitPointがnullです。");
+        }
+    }
 
 }
 
@@ -86,15 +98,16 @@ const surroundingBlocks = createSurroundingBlocks(50, 50, 100, 100, 10);
 
 
 
-function createAnimalEntity(initPoint: Point) {
+function createAnimalEntity(initPoint: Point, color: string) {
     const animal = new Entity();
     animal.components.PositionComponent = new PositionComponent(initPoint.x, initPoint.y);
     animal.components.SizeComponent = new SizeComponent(2, 2);
     animal.components.VelocityComponent = new VelocityComponent(0, 0);
-    animal.components.ColliderComponent = new ColliderComponent("animal", ['block']);
-    animal.components.ShapeComponent = new ShapeComponent('square', 'black');
+    // animal.components.ColliderComponent = new ColliderComponent("animal", ['block']);
+    animal.components.ShapeComponent = new ShapeComponent('circle', color);
     animal.components.AnimalComponent = new AnimalComponent();
     animal.components.PathfindComponent = new PathfindComponent();
+    animal.components.LabelComponent = new LabelComponent(generateRandomJapaneseLastName(), color);
     return animal;
 }
 
