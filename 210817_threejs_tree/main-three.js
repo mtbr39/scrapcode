@@ -26,7 +26,6 @@ const height = 540;
 let smoothScrollY = 0;
 
 function init() {
-    let logElement = document.getElementById("test-log");
     
     // レンダラーを作成
     const renderer = new THREE.WebGLRenderer({
@@ -135,6 +134,5 @@ function init() {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
 
-        logElement.textContent = String(width) +", "+ String(height);
     }
 }
